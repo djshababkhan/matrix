@@ -72,7 +72,9 @@ const defaults = {
 	effect: "palette", // The name of the effect to apply at the end of the process— mainly handles coloration
 	baseTexture: null, // The name of the texture to apply to the base layer of the glyphs
 	glintTexture: null, // The name of the texture to apply to the glint layer of the glyphs
-	useCamera: false,
+	customMessage: "",
+	messageColumn: -1,
+	messageAllColumns: true,
 	backgroundColor: hsl(0, 0, 0), // The color "behind" the glyphs
 	isolateCursor: true, // Whether the "cursor"— the brightest glyph at the bottom of a raindrop— has its own color
 	cursorColor: hsl(0.242, 1, 0.73), // The color of the cursor
@@ -404,7 +406,7 @@ versions["2021"] = versions.resurrections;
 
 const range = (f, min = -Infinity, max = Infinity) => Math.max(min, Math.min(max, f));
 const nullNaN = (f) => (isNaN(f) ? null : f);
-const isTrue = (s) => s.toLowerCase().includes("true");
+const isTrue = (s) => (typeof s === "boolean" ? s : s && typeof s === "string" ? s.toLowerCase().includes("true") : false);
 
 const parseColor = (isHSL) => (s) => ({
 	space: isHSL ? "hsl" : "rgb",
@@ -444,7 +446,9 @@ const paramMapping = {
 	version: { key: "version", parser: (s) => s },
 	font: { key: "font", parser: (s) => s },
 	effect: { key: "effect", parser: (s) => s },
-	camera: { key: "useCamera", parser: isTrue },
+	message: { key: "customMessage", parser: (s) => decodeURIComponent(s) },
+	messageColumn: { key: "messageColumn", parser: (s) => nullNaN(parseInt(s)) },
+	messageAllColumns: { key: "messageAllColumns", parser: isTrue },
 	numColumns: { key: "numColumns", parser: (s) => nullNaN(parseInt(s)) },
 	density: { key: "density", parser: (s) => nullNaN(range(parseFloat(s), 0)) },
 	resolution: { key: "resolution", parser: (s) => nullNaN(parseFloat(s)) },
@@ -528,8 +532,20 @@ paramMapping.angle = paramMapping.slant;
 paramMapping.colors = paramMapping.stripeColors;
 
 export default (urlParams) => {
+	let savedDefaults = {};
+	try {
+		const stored = localStorage.getItem("matrix_saved_defaults");
+		if (stored) {
+			savedDefaults = JSON.parse(stored);
+		}
+	} catch (e) {
+		console.warn("Failed to parse saved defaults:", e);
+	}
+
+	const mergedParams = { ...savedDefaults, ...urlParams };
+
 	const validParams = Object.fromEntries(
-		Object.entries(urlParams)
+		Object.entries(mergedParams)
 			.filter(([key]) => key in paramMapping)
 			.map(([key, value]) => [paramMapping[key].key, paramMapping[key].parser(value)])
 			.filter(([_, value]) => value != null),

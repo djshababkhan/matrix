@@ -20,7 +20,7 @@ const makeComputeDoubleBuffer = (regl, height, width) =>
 		height,
 		wrapT: "clamp",
 		type: "half float",
-		data: Array(width * height * 4).fill(0)
+		data: Array(width * height * 4).fill(0),
 	});
 
 const numVerticesPerQuad = 2 * 3;
@@ -89,16 +89,82 @@ export default ({ regl, config, lkg }) => {
 			...raindropUniforms,
 			introState: introDoubleBuffer.front,
 			previousRaindropState: raindropDoubleBuffer.back,
+			messageEnabled: () => (messageEnabled ? 1.0 : 0.0),
+			messageColumn: () => messageColumn,
+			messageAllColumns: () => (config.messageAllColumns ? 1.0 : 0.0),
 		},
 
 		framebuffer: raindropDoubleBuffer.front,
 	});
+
+	const charToGlyphIndex = {
+		A: 26,
+		B: 44,
+		C: 53,
+		D: 40,
+		E: 1,
+		F: 25,
+		G: 34,
+		H: 23,
+		I: 37,
+		J: 39,
+		K: 3,
+		L: 36,
+		M: 54,
+		N: 20,
+		O: 4,
+		P: 44,
+		Q: 52,
+		R: 37,
+		S: 8,
+		T: 15,
+		U: 28,
+		V: 42,
+		W: 16,
+		X: 51,
+		Y: 2,
+		Z: 10,
+		" ": 38,
+		0: 24,
+		1: 11,
+		2: 13,
+		3: 27,
+		4: 17,
+		5: 12,
+		6: 0,
+		7: 6,
+		8: 22,
+		9: 21,
+	};
+
+	const messageStr = (config.customMessage || "").trim();
+	const messageEnabled = messageStr.length > 0;
+	const messageLength = Math.min(messageStr.length, 32);
+	const messageIndices = Array(32).fill(0);
+	const seqLength = config.glyphSequenceLength || 57;
+
+	const upperMessage = messageStr.toUpperCase();
+	for (let i = 0; i < messageLength; i++) {
+		const char = upperMessage[i];
+		if (char in charToGlyphIndex) {
+			messageIndices[i] = charToGlyphIndex[char];
+		} else {
+			messageIndices[i] = char.charCodeAt(0) % seqLength;
+		}
+	}
+
+	const messageColumn = config.messageColumn >= 0 ? config.messageColumn : Math.floor(numColumns / 2);
 
 	const symbolDoubleBuffer = makeComputeDoubleBuffer(regl, numRows, numColumns);
 	const rainPassSymbol = loadText("shaders/glsl/rainPass.symbol.frag.glsl");
 	const symbolUniforms = {
 		...commonUniforms,
 		...extractEntries(config, ["cycleSpeed", "cycleFrameSkip", "loops"]),
+		messageEnabled: messageEnabled ? 1.0 : 0.0,
+		messageIndices,
+		messageLength,
+		messageColumn,
+		messageAllColumns: config.messageAllColumns ? 1.0 : 0.0,
 	};
 	const symbol = regl({
 		frag: regl.prop("frag"),
@@ -134,7 +200,7 @@ export default ({ regl, config, lkg }) => {
 		.map((_, y) =>
 			Array(numQuadColumns)
 				.fill()
-				.map((_, x) => Array(numVerticesPerQuad).fill([x, y]))
+				.map((_, x) => Array(numVerticesPerQuad).fill([x, y])),
 		);
 
 	// We render the code into an FBO using MSDFs: https://github.com/Chlumsky/msdfgen
@@ -315,6 +381,6 @@ export default ({ regl, config, lkg }) => {
 					render({ ...vantagePoint, transform, screenSize, vert: rainPassVert.text(), frag: rainPassFrag.text() });
 				}
 			}
-		}
+		},
 	);
 };

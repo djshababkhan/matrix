@@ -7,7 +7,10 @@ import makeStripePass from "./stripePass.js";
 import makeImagePass from "./imagePass.js";
 import makeQuiltPass from "./quiltPass.js";
 import makeMirrorPass from "./mirrorPass.js";
-import { setupCamera, cameraCanvas, cameraAspectRatio } from "../camera.js";
+const cameraCanvas = document.createElement("canvas");
+cameraCanvas.width = 1;
+cameraCanvas.height = 1;
+const cameraAspectRatio = 1.0;
 import getLKG from "./lkgHelper.js";
 
 const effects = {
@@ -57,10 +60,6 @@ export default async (canvas, config) => {
 		};
 	}
 	resize();
-
-	if (config.useCamera) {
-		await setupCamera();
-	}
 
 	const extensions = ["OES_texture_half_float", "OES_texture_half_float_linear"];
 	// These extensions are also needed, but Safari misreports that they are missing
@@ -112,9 +111,6 @@ export default async (canvas, config) => {
 			}
 		}
 
-		if (config.useCamera) {
-			cameraTex(cameraCanvas);
-		}
 		if (dimensions.width !== viewportWidth || dimensions.height !== viewportHeight) {
 			dimensions.width = viewportWidth;
 			dimensions.height = viewportHeight;

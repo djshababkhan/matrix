@@ -8,7 +8,11 @@ import makeStripePass from "./stripePass.js";
 import makeImagePass from "./imagePass.js";
 import makeMirrorPass from "./mirrorPass.js";
 import makeEndPass from "./endPass.js";
-import { setupCamera, cameraCanvas, cameraAspectRatio, cameraSize } from "../camera.js";
+const cameraCanvas = document.createElement("canvas");
+cameraCanvas.width = 1;
+cameraCanvas.height = 1;
+const cameraAspectRatio = 1.0;
+const cameraSize = [1, 1];
 
 const loadJS = (src) =>
 	new Promise((resolve, reject) => {
@@ -47,10 +51,6 @@ export default async (canvas, config) => {
 				document.exitFullscreen();
 			}
 		};
-	}
-
-	if (config.useCamera) {
-		await setupCamera();
 	}
 
 	const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
@@ -122,10 +122,6 @@ export default async (canvas, config) => {
 			canvas.width = canvasWidth;
 			canvas.height = canvasHeight;
 			outputs = pipeline.build(canvasSize);
-		}
-
-		if (config.useCamera) {
-			device.queue.copyExternalImageToTexture({ source: cameraCanvas }, { texture: cameraTex }, cameraSize);
 		}
 
 		device.queue.writeBuffer(timeBuffer, 0, timeUniforms.toBuffer({ seconds: (now - start) / 1000, frames }));

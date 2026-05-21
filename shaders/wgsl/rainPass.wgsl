@@ -47,6 +47,18 @@ struct Config {
 	loops : i32,
 	skipIntro : i32,
 	highPassThreshold : f32,
+	messageEnabled : i32,
+	messageLength : i32,
+	messageColumn : i32,
+	messageAllColumns : i32,
+	messageIndices0 : vec4<f32>,
+	messageIndices1 : vec4<f32>,
+	messageIndices2 : vec4<f32>,
+	messageIndices3 : vec4<f32>,
+	messageIndices4 : vec4<f32>,
+	messageIndices5 : vec4<f32>,
+	messageIndices6 : vec4<f32>,
+	messageIndices7 : vec4<f32>,
 };
 
 // The properties that change over time get their own buffer.
@@ -262,8 +274,51 @@ fn computeRaindrop (simTime : f32, isFirstFrame : bool, glyphPos : vec2<f32>, sc
 		brightness = mix(previousBrightness, brightness, config.brightnessDecay);
 	}
 
+	if (config.messageEnabled != 0 && (config.messageAllColumns != 0 || i32(glyphPos.x) == config.messageColumn)) {
+		activated = true;
+		brightness = max(brightness, 0.45);
+	}
+
 	var result = vec4<f32>(brightness, f32(cursor), f32(activated), introProgress);
 	return result;
+}
+
+fn getMessageChar(idx: i32) -> f32 {
+	switch (idx) {
+		case 0: { return config.messageIndices0.x; }
+		case 1: { return config.messageIndices0.y; }
+		case 2: { return config.messageIndices0.z; }
+		case 3: { return config.messageIndices0.w; }
+		case 4: { return config.messageIndices1.x; }
+		case 5: { return config.messageIndices1.y; }
+		case 6: { return config.messageIndices1.z; }
+		case 7: { return config.messageIndices1.w; }
+		case 8: { return config.messageIndices2.x; }
+		case 9: { return config.messageIndices2.y; }
+		case 10: { return config.messageIndices2.z; }
+		case 11: { return config.messageIndices2.w; }
+		case 12: { return config.messageIndices3.x; }
+		case 13: { return config.messageIndices3.y; }
+		case 14: { return config.messageIndices3.z; }
+		case 15: { return config.messageIndices3.w; }
+		case 16: { return config.messageIndices4.x; }
+		case 17: { return config.messageIndices4.y; }
+		case 18: { return config.messageIndices4.z; }
+		case 19: { return config.messageIndices4.w; }
+		case 20: { return config.messageIndices5.x; }
+		case 21: { return config.messageIndices5.y; }
+		case 22: { return config.messageIndices5.z; }
+		case 23: { return config.messageIndices5.w; }
+		case 24: { return config.messageIndices6.x; }
+		case 25: { return config.messageIndices6.y; }
+		case 26: { return config.messageIndices6.z; }
+		case 27: { return config.messageIndices6.w; }
+		case 28: { return config.messageIndices7.x; }
+		case 29: { return config.messageIndices7.y; }
+		case 30: { return config.messageIndices7.z; }
+		case 31: { return config.messageIndices7.w; }
+		default: { return 0.0; }
+	}
 }
 
 fn computeSymbol (simTime : f32, isFirstFrame : bool, glyphPos : vec2<f32>, screenPos : vec2<f32>, previous : vec4<f32>, raindrop : vec4<f32>) -> vec4<f32> {
@@ -287,6 +342,13 @@ fn computeSymbol (simTime : f32, isFirstFrame : bool, glyphPos : vec2<f32>, scre
 		if (age > 1.0) {
 			symbol = floor(config.glyphSequenceLength * randomFloat(screenPos + simTime));
 			age = fract(age);
+		}
+	}
+
+	if (config.messageEnabled != 0 && (config.messageAllColumns != 0 || i32(glyphPos.x) == config.messageColumn)) {
+		let messageIndex = i32(config.gridSize.y) - 1 - i32(glyphPos.y);
+		if (messageIndex >= 0 && messageIndex < config.messageLength) {
+			symbol = getMessageChar(messageIndex);
 		}
 	}
 

@@ -25,6 +25,10 @@ uniform bool loops, skipIntro;
 uniform float brightnessDecay;
 uniform float raindropLength;
 
+uniform float messageEnabled;
+uniform float messageColumn;
+uniform float messageAllColumns;
+
 // Helper functions for generating randomness, borrowed from elsewhere
 
 highp float randomFloat( const in vec2 uv ) {
@@ -76,6 +80,11 @@ vec4 computeResult(float simTime, bool isFirstFrame, vec2 glyphPos, vec4 previou
 	if (!isFirstFrame) {
 		float previousBrightness = previous.r;
 		brightness = mix(previousBrightness, brightness, brightnessDecay);
+	}
+
+	if (messageEnabled > 0.5 && (messageAllColumns > 0.5 || int(glyphPos.x) == int(messageColumn))) {
+		activated = true;
+		brightness = max(brightness, 0.45);
 	}
 
 	vec4 result = vec4(brightness, cursor, activated, introProgress);

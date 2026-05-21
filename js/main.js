@@ -1,4 +1,5 @@
 import makeConfig from "./config.js";
+import { initUI } from "./ui.js";
 
 const canvas = document.createElement("canvas");
 document.body.appendChild(canvas);
@@ -40,8 +41,10 @@ document.body.onload = async () => {
 			(await solution).default(canvas, config);
 			canvas.style.display = "unset";
 			document.body.removeChild(notice);
+			initUI(config);
 		});
 	} else {
 		(await solution).default(canvas, config);
+		initUI(config);
 	}
 };

@@ -17,7 +17,7 @@ const makeDoubleBuffer = (regl, props) => {
 			regl.framebuffer({
 				color: regl.texture(props),
 				depthStencil: false,
-			})
+			}),
 		);
 	return {
 		front: ({ tick }) => state[tick % 2],

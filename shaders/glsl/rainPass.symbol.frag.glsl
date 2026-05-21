@@ -16,6 +16,13 @@ uniform float animationSpeed, cycleSpeed;
 uniform bool loops, showDebugView;
 uniform float glyphSequenceLength;
 
+// Custom Hidden Message Uniforms
+uniform float messageEnabled;
+uniform float messageIndices[32];
+uniform float messageLength;
+uniform float messageColumn;
+uniform float messageAllColumns;
+
 // Helper functions for generating randomness, borrowed from elsewhere
 
 highp float randomFloat( const in vec2 uv ) {
@@ -46,6 +53,19 @@ vec4 computeResult(float simTime, bool isFirstFrame, vec2 glyphPos, vec2 screenP
 		if (age >= 1.) {
 			symbol = floor(glyphSequenceLength * randomFloat(screenPos + simTime));
 			age = fract(age);
+		}
+	}
+
+	// Apply visual phonetic custom message to designated column
+	if (messageEnabled > 0.5 && (messageAllColumns > 0.5 || int(glyphPos.x) == int(messageColumn))) {
+		int messageIndex = int(numRows) - 1 - int(glyphPos.y);
+		if (messageIndex >= 0 && messageIndex < int(messageLength)) {
+			// WebGL 1.0 dynamic array index workaround (must use constant-bounded loop)
+			for (int idx = 0; idx < 32; idx++) {
+				if (idx == messageIndex) {
+					symbol = messageIndices[idx];
+				}
+			}
 		}
 	}
 

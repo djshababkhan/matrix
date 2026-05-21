@@ -9,6 +9,73 @@ const rippleTypes = {
 const numVerticesPerQuad = 2 * 3;
 
 const makeConfigBuffer = (device, configUniforms, config, density, gridSize, glyphTransform) => {
+	const charToGlyphIndex = {
+		A: 26,
+		B: 44,
+		C: 53,
+		D: 40,
+		E: 1,
+		F: 25,
+		G: 34,
+		H: 23,
+		I: 37,
+		J: 39,
+		K: 3,
+		L: 36,
+		M: 54,
+		N: 20,
+		O: 4,
+		P: 44,
+		Q: 52,
+		R: 37,
+		S: 8,
+		T: 15,
+		U: 28,
+		V: 42,
+		W: 16,
+		X: 51,
+		Y: 2,
+		Z: 10,
+		" ": 38,
+		0: 24,
+		1: 11,
+		2: 13,
+		3: 27,
+		4: 17,
+		5: 12,
+		6: 0,
+		7: 6,
+		8: 22,
+		9: 21,
+	};
+
+	const messageStr = (config.customMessage || "").trim();
+	const messageEnabled = messageStr.length > 0 ? 1 : 0;
+	const messageLength = Math.min(messageStr.length, 32);
+	const messageIndices = Array(32).fill(0);
+	const seqLength = config.glyphSequenceLength || 57;
+
+	const upperMessage = messageStr.toUpperCase();
+	for (let i = 0; i < messageLength; i++) {
+		const char = upperMessage[i];
+		if (char in charToGlyphIndex) {
+			messageIndices[i] = charToGlyphIndex[char];
+		} else {
+			messageIndices[i] = char.charCodeAt(0) % seqLength;
+		}
+	}
+
+	const messageColumn = config.messageColumn >= 0 ? config.messageColumn : Math.floor(gridSize[0] / 2);
+
+	const messageIndices0 = messageIndices.slice(0, 4);
+	const messageIndices1 = messageIndices.slice(4, 8);
+	const messageIndices2 = messageIndices.slice(8, 12);
+	const messageIndices3 = messageIndices.slice(12, 16);
+	const messageIndices4 = messageIndices.slice(16, 20);
+	const messageIndices5 = messageIndices.slice(20, 24);
+	const messageIndices6 = messageIndices.slice(24, 28);
+	const messageIndices7 = messageIndices.slice(28, 32);
+
 	const configData = {
 		...config,
 		gridSize,
@@ -19,6 +86,18 @@ const makeConfigBuffer = (device, configUniforms, config, density, gridSize, gly
 		slantVec: [Math.cos(config.slant), Math.sin(config.slant)],
 		msdfPxRange: 4,
 		glyphTransform,
+		messageEnabled,
+		messageLength,
+		messageColumn,
+		messageAllColumns: config.messageAllColumns ? 1 : 0,
+		messageIndices0,
+		messageIndices1,
+		messageIndices2,
+		messageIndices3,
+		messageIndices4,
+		messageIndices5,
+		messageIndices6,
+		messageIndices7,
 	};
 	// console.table(configData);
 
