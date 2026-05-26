@@ -915,7 +915,7 @@ export function initUI(config) {
 							<span class="matrix-ui-value" id="val-effect">${activeEffect}</span>
 						</div>
 						<select id="ctrl-effect" class="matrix-ui-select">
-							<option value="palette">Dynamic Color Palette</option>
+							<option value="palette">Normal Colours</option>
 							<option value="stripes">Vertical Matrix Stripes</option>
 							<option value="pride">Pride LGBTQ+ Stripes</option>
 							<option value="trans">Trans Pride Stripes</option>

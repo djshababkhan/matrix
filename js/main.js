@@ -1,5 +1,5 @@
 import makeConfig from "./config.js";
-import { initUI } from "./ui.js";
+import { initUI } from "./ui.js?v=2";
 
 const canvas = document.createElement("canvas");
 document.body.appendChild(canvas);
