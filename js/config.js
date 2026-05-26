@@ -589,6 +589,50 @@ export default (urlParams) => {
 		hasGlintTexture,
 	};
 
+	// Apply preset color mapping palettes & cursor colors if selected
+	if (config.effect === "red") {
+		config.palette = [
+			{ color: hsl(0.0, 1.0, 0.0), at: 0.0 },
+			{ color: hsl(0.0, 1.0, 0.25), at: 0.2 },
+			{ color: hsl(0.0, 1.0, 0.7), at: 0.7 },
+			{ color: hsl(0.0, 1.0, 0.8), at: 0.8 },
+		];
+		config.cursorColor = hsl(0.0, 1.0, 0.8);
+	} else if (config.effect === "green") {
+		config.palette = [
+			{ color: hsl(0.3, 0.9, 0.0), at: 0.0 },
+			{ color: hsl(0.3, 0.9, 0.2), at: 0.2 },
+			{ color: hsl(0.3, 0.9, 0.7), at: 0.7 },
+			{ color: hsl(0.3, 0.9, 0.8), at: 0.8 },
+		];
+		config.cursorColor = hsl(0.3, 1.0, 0.8);
+	} else if (config.effect === "blue") {
+		config.palette = [
+			{ color: hsl(0.6, 0.9, 0.0), at: 0.0 },
+			{ color: hsl(0.6, 0.9, 0.25), at: 0.2 },
+			{ color: hsl(0.6, 0.9, 0.7), at: 0.7 },
+			{ color: hsl(0.6, 0.9, 0.8), at: 0.8 },
+		];
+		config.cursorColor = hsl(0.6, 1.0, 0.8);
+	} else if (config.effect === "gold") {
+		config.palette = [
+			{ color: hsl(0.1, 1.0, 0.0), at: 0.0 },
+			{ color: hsl(0.1, 1.0, 0.25), at: 0.2 },
+			{ color: hsl(0.1, 1.0, 0.6), at: 0.7 },
+			{ color: hsl(0.1, 1.0, 0.8), at: 0.8 },
+		];
+		config.cursorColor = hsl(0.1, 1.0, 0.8);
+	} else if (config.effect === "mix") {
+		config.palette = [
+			{ color: hsl(0.0, 1.0, 0.15), at: 0.0 },
+			{ color: hsl(0.15, 1.0, 0.35), at: 0.25 },
+			{ color: hsl(0.35, 1.0, 0.55), at: 0.5 },
+			{ color: hsl(0.55, 1.0, 0.7), at: 0.75 },
+			{ color: hsl(0.8, 1.0, 0.8), at: 1.0 },
+		];
+		config.cursorColor = hsl(0.9, 1.0, 0.9);
+	}
+
 	if (config.bloomSize <= 0) {
 		config.bloomStrength = 0;
 	}

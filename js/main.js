@@ -1,4 +1,4 @@
-import makeConfig from "./config.js";
+import makeConfig from "./config.js?v=2";
 import { initUI } from "./ui.js?v=2";
 
 const canvas = document.createElement("canvas");
@@ -22,7 +22,7 @@ document.body.onload = async () => {
 	const urlParams = new URLSearchParams(window.location.search);
 	const config = makeConfig(Object.fromEntries(urlParams.entries()));
 	const useWebGPU = (await supportsWebGPU()) && ["webgpu"].includes(config.renderer?.toLowerCase());
-	const solution = import(`./${useWebGPU ? "webgpu" : "regl"}/main.js`);
+	const solution = import(`./${useWebGPU ? "webgpu" : "regl"}/main.js?v=2`);
 
 	if (isRunningSwiftShader() && !config.suppressWarnings) {
 		const notice = document.createElement("notice");
